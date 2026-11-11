@@ -1,3 +1,14 @@
+# Frigo Express — Historique des versions
+
+## V0.3.1 — 11 novembre 2026
+
+- Retour à une base sans marqueurs de conflits Git ; fichiers JavaScript/HTML/CSS reconstruits à partir du dernier projet sain.
+- 326 recettes et 127 produits. 23 nouveautés dont blanquette de veau, bœuf bourguignon, bœuf-carottes et 20 desserts/gâteaux faciles.
+- Explications améliorées pour les deux hachis Parmentier déjà existants, IDs conservés.
+- Une recherche textuelle consulte le catalogue entier, même avec le filtre « Avec mon frigo ».
+- Nouveau cache offline V0.3.1. Aucun changement de la clé de sauvegarde.
+- Tests logiques réussis ; tests automatiques de navigateur bloqués par politique Chromium, à confirmer sur Samsung.
+
 # Historique des versions — Frigo Express
 
 ## V0.3.0 — 10 novembre 2026

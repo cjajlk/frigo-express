@@ -1,19 +1,12 @@
-<<<<<<< HEAD
-/* Frigo Express V0.3 — application locale, sans dépendance. */
-=======
-/* Frigo Express V0.2 — application locale, sans dépendance. */
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
+/* Frigo Express V0.3.1 — recettes classiques et recherche améliorée. */
 (() => {
   'use strict';
   const D=window.FRIGO_DATA;
   if(!D){document.body.textContent='Catalogue absent : vérifie le fichier js/data.js.';return;}
   const PRODUCTS=D.products, RECIPES=D.recipes, BYID=Object.fromEntries(RECIPES.map(r=>[r.id,r]));
-  const PHOTOS={'r065':'poulet_roti.webp','r149':'lasagnes.webp','r150':'gratin_poulet.webp','r151':'poulet_legumes.webp'};
-  const photoOf=r=>PHOTOS[r.id]?`assets/recipes/${PHOTOS[r.id]}`:null;
   const STORE='frigo-express-v01', WEEKDAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   const MEALS=[{id:'petit',label:'Petit-déjeuner',emoji:'☀️'},{id:'midi',label:'Déjeuner',emoji:'🍽️'},{id:'soir',label:'Dîner',emoji:'🌙'}];
   const CAT_LABEL={petit:'Petit-déjeuner',entree:'Entrée',plat:'Plat',dessert:'Dessert'};
-<<<<<<< HEAD
   const EQUIPMENTS=[['four','Four'],['plaques','Plaques / cuisinière'],['micro-ondes','Micro-ondes'],['gaufrier','Gaufrier'],['friteuse','Friteuse'],['raclette','Appareil à raclette'],['crepiere','Crêpière']];
   const ALL_EQUIPMENTS=EQUIPMENTS.map(x=>x[0]);
   const MODE_LABEL={all:'Petit-déjeuner, midi et soir',lunch_dinner:'Midi et soir',dinner:'Le soir uniquement'};
@@ -23,21 +16,6 @@
   const equipmentAllowed=recipe=>{const eq=equipmentFor(recipe);return !eq||state.equipments.includes(eq);};
   const photoForRecipe=r=>{const name=r.title.toLocaleLowerCase('fr');if(name==='mousse au chocolat')return 'assets/recipes/mousse-chocolat.webp';if(name.startsWith('gâteau au yaourt'))return 'assets/recipes/gateau-yaourt.webp';if(name==='spaghetti bolognaise')return 'assets/recipes/spaghetti-bolognaise.webp';return null;};
 
-=======
-  const EQUIPMENT={four:'Four',poele:'Poêle',casserole:'Casserole',micro_ondes:'Micro-ondes',gaufrier:'Gaufrier',friteuse:'Friteuse',raclette:'Appareil à raclette',crepiere:'Crêpière'};
-  const METHOD_EQUIPMENT={'four':'four','poêle':'poele','casserole':'casserole','micro-ondes':'micro_ondes','gaufrier':'gaufrier','friteuse':'friteuse','raclette':'raclette','crêpière':'crepiere'};
-  const DEFAULT_EQUIPMENT={four:true,poele:true,casserole:true,micro_ondes:true,gaufrier:false,friteuse:false,raclette:false,crepiere:false};
-  const MEAL_MODES={'all':['petit','midi','soir'],'lunch-dinner':['midi','soir'],'dinner':['soir']};
-  const selectedMeals=()=>MEAL_MODES[state.mealMode]||MEAL_MODES.all;
-  const isMealEnabled=meal=>selectedMeals().includes(meal);
-  const allowsEquipment=(r)=>!METHOD_EQUIPMENT[r.method]||!!state.equipment[METHOD_EQUIPMENT[r.method]];
-  const displayUnit=(p,item)=>item?.displayUnit || p.unit;
-  const conversion=(p,u,size)=>u==='kg'&&p.unit==='g'?1000:u==='cl'&&p.unit==='ml'?10:u==='l'&&p.unit==='ml'?1000:u==='paquet'&&['g','ml','u','tranche'].includes(p.unit)?Number(size)||null:u==='piece'&&p.unit==='g'?null:1;
-  function shownQty(p,item){if(item.qty===null)return item.displayQty??null;const factor=conversion(p,displayUnit(p,item),item.unitSize);return factor?Number((item.qty/factor).toFixed(3)):item.displayQty??null;}
-  const unitChoices=p=>p.unit==='g'?[['g','g'],['kg','kg'],['paquet','Paquet'],['piece','Pièce']]:p.unit==='ml'?[['ml','ml'],['cl','cl'],['l','L'],['paquet','Brique / bouteille']]:p.unit==='u'?[['u','pièce(s)'],['paquet','Boîte']]:[['tranche','tranche(s)'],['paquet','Paquet']];
-  function formatShopping(id,q){const p=PRODUCTS[id];return fmt(id,['u','tranche'].includes(p.unit)?Math.ceil(q-0.000000001):q);}
-  
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
   const $=(selector,root=document)=>root.querySelector(selector);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const unitLabel=(unit,q)=>unit==='u'?'pièce'+(q>1?'s':''):unit==='tranche'?'tranche'+(q>1?'s':''):unit;
@@ -105,7 +83,6 @@
       const id=productFromText(remaining);
       if(!id){output.push({recognized:false,text:chunk,reason:'Produit non reconnu'});continue;}
       const expected=PRODUCTS[id].unit;
-<<<<<<< HEAD
       if(packSizeNoUnit!==null&&['u','tranche'].includes(expected))packSize=packSizeNoUnit;
       let converted=null,detail='Quantité non précisée';
       if(q!==null && Number.isFinite(q) && q>0 && q<=100000){
@@ -127,43 +104,10 @@
       else if(['paquet','paquets','boite','boites'].includes(unit))displayUnit='paquet';
       displayUnit=validDisplayUnit(PRODUCTS[id],displayUnit);
       output.push({recognized:true,id,qty:converted,detail,raw:chunk,displayUnit,packCount:displayUnit==='paquet'?q:null,packSize:packSize??null});
-=======
-      let converted=null,detail='Quantité non précisée',displayUnit=expected,displayQty=null,unitSize=null;
-      if(q!==null && Number.isFinite(q) && q>0 && q<=100000){
-        const type=unit||'u';
-        const pack=['boite','boites','paquet','paquets'].includes(type);
-        displayQty=q;
-        if(pack){
-          displayUnit='paquet';
-          // « 2 paquets de pâtes de 500 g » => 1 000 g, sans supposer la taille des paquets.
-          const size=remaining.match(/(?:de |d['’]|a |à )?(\d+(?:[.,]\d+)?)\s*(kg|g|grammes?|ml|cl|l|litres?|pi[eè]ces?|tranches?)\b/i);
-          if(size){
-            const n=Number(size[1].replace(',','.')),rawUnit=slug(size[2]);
-            unitSize=expected==='g'&&rawUnit==='kg'?n*1000:expected==='g'&&['g','gramme','grammes'].includes(rawUnit)?n:
-              expected==='ml'&&rawUnit==='cl'?n*10:expected==='ml'&&['l','litre','litres'].includes(rawUnit)?n*1000:
-              expected==='ml'&&rawUnit==='ml'?n:['u','tranche'].includes(expected)&&['pieces','piece','tranche','tranches'].includes(rawUnit)?n:null;
-            if(unitSize)converted=q*unitSize;
-          }
-          if(converted===null)detail='Indique la contenance du paquet pour calculer les courses';
-        }else{
-          if(expected==='g'&&['g','gramme','grammes'].includes(type)) converted=q;
-          if(expected==='g'&&['kg','kilo','kilos'].includes(type)){converted=q*1000;displayUnit='kg';}
-          if(expected==='ml'&&type==='ml')converted=q;
-          if(expected==='ml'&&type==='cl'){converted=q*10;displayUnit='cl';}
-          if(expected==='ml'&&['l','litre','litres'].includes(type)){converted=q*1000;displayUnit='l';}
-          if(expected==='u'&&['u','piece','pieces','unite','unites','gousse','gousses'].includes(type))converted=q;
-          if(expected==='tranche'&&['u','tranche','tranches'].includes(type))converted=q;
-          if(expected==='g'&&['u','piece','pieces'].includes(type))displayUnit='piece';
-          if(converted===null)detail=`${rawQty} : poids ou quantité à vérifier pour les recettes`;
-        }
-      }else if(q!==null)detail='Quantité impossible à convertir';
-      output.push({recognized:true,id,qty:converted,detail,raw:chunk,displayUnit,displayQty,unitSize});
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     }
     return output;
   }
   function emptyPlan(){return WEEKDAYS.map(()=>({petit:null,midi:{plat:null,entree:null,dessert:null},soir:{plat:null,entree:null,dessert:null}}));}
-<<<<<<< HEAD
   const fresh=()=>({stock:{},unknown:[],favorites:[],people:2,priority:'stock',method:'all',mealMode:'all',equipments:[...ALL_EQUIPMENTS],vegetarian:false,porkFree:false,fullCourses:false,plan:emptyPlan(),locks:{},checked:{},manual:[],history:[]});
   function validate(s){
     const base=fresh();if(!s||typeof s!=='object'||Array.isArray(s))return base;
@@ -175,32 +119,14 @@
         packCount:item?.packCount===null||item?.packCount===undefined||!Number.isFinite(packCount)?null:Math.max(0,Math.min(1000000,packCount)),
         packSize:item?.packSize===null||item?.packSize===undefined||!Number.isFinite(packSize)||packSize<=0?null:Math.max(0,Math.min(1000000,packSize)),
         expires:/^\d{4}-\d{2}-\d{2}$/.test(String(item?.expires||''))?String(item.expires):'',dateType:['dlc','ddm'].includes(item?.dateType)?item.dateType:['Épicerie','Conserves','Boissons','Surgelés'].includes(p.category)?'ddm':'dlc'};
-=======
-  const fresh=()=>({stock:{},unknown:[],favorites:[],people:2,priority:'stock',method:'all',mealMode:'all',equipment:{...DEFAULT_EQUIPMENT},vegetarian:false,porkFree:false,fullCourses:false,plan:emptyPlan(),locks:{},checked:{},manual:[]});
-  function validate(s){
-    const base=fresh();if(!s||typeof s!=='object'||Array.isArray(s))return base;
-    if(s.stock&&typeof s.stock==='object')for(const [id,item] of Object.entries(s.stock))if(PRODUCTS[id]){
-      const n=Number(item?.qty);const unit=unitChoices(PRODUCTS[id]).map(v=>v[0]).includes(item?.displayUnit)?item.displayUnit:PRODUCTS[id].unit;
-      const size=item?.unitSize===null||item?.unitSize===undefined?NaN:Number(item.unitSize);
-      const displayQty=Number(item?.displayQty);
-      base.stock[id]={qty:item?.qty===null||item?.qty===undefined?null:Number.isFinite(n)?Math.max(0,Math.min(1000000,n)):null,
-        detail:String(item?.detail||'').slice(0,120),displayUnit:unit,
-        unitSize:Number.isFinite(size)&&size>0&&size<=1000000?size:null,
-        displayQty:item?.displayQty!==null&&item?.displayQty!==undefined&&Number.isFinite(displayQty)&&displayQty>=0&&displayQty<=1000000?displayQty:null};
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     }
     if(Array.isArray(s.unknown))base.unknown=s.unknown.slice(0,80).filter(x=>typeof x?.text==='string').map(x=>({text:x.text.slice(0,180),reason:'Produit non reconnu'}));
     if(Array.isArray(s.favorites))base.favorites=[...new Set(s.favorites.filter(id=>BYID[id]))];
     base.people=Number.isInteger(Number(s.people))?Math.min(12,Math.max(1,Number(s.people))):2;
     base.priority=['stock','variety','quick'].includes(s.priority)?s.priority:'stock';
     base.method=['all','nooven'].includes(s.method)?s.method:'all';
-<<<<<<< HEAD
     base.mealMode=Object.hasOwn(MODE_LABEL,s.mealMode)?s.mealMode:'all';
     if(Array.isArray(s.equipments))base.equipments=[...new Set(s.equipments.filter(x=>ALL_EQUIPMENTS.includes(x)))];
-=======
-    base.mealMode=MEAL_MODES[s.mealMode]?s.mealMode:'all';
-    if(s.equipment&&typeof s.equipment==='object')for(const key of Object.keys(EQUIPMENT))if(typeof s.equipment[key]==='boolean')base.equipment[key]=s.equipment[key];
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     base.vegetarian=!!s.vegetarian;base.porkFree=!!s.porkFree;base.fullCourses=!!s.fullCourses;
     if(Array.isArray(s.plan)&&s.plan.length===7)base.plan=s.plan.map((day)=>({
       petit:BYID[day?.petit]?.cat==='petit'?day.petit:null,
@@ -229,11 +155,7 @@
   }
   function addParsed(text){const parsed=parseStock(text);if(!parsed.length){toast('Écris au moins un ingrédient.');return;}
     let recognized=0,unknown=0;
-<<<<<<< HEAD
     for(const item of parsed){if(item.recognized){state.stock[item.id]={...state.stock[item.id],qty:item.qty,detail:item.detail,displayUnit:item.displayUnit,packSize:item.packSize,packCount:item.packCount};recognized++;}else{
-=======
-    for(const item of parsed){if(item.recognized){state.stock[item.id]={qty:item.qty,detail:item.detail,displayUnit:item.displayUnit,displayQty:item.displayQty,unitSize:item.unitSize};recognized++;}else{
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
       if(!state.unknown.some(x=>x.text.toLowerCase()===item.text.toLowerCase()))state.unknown.push(item);unknown++;
     }}
     resetProductChecks();save();renderAll();toast(`${recognized} ingrédient(s) enregistré(s)${unknown?' · '+unknown+' à identifier':''}. Les nouvelles saisies remplacent la quantité d’un même produit.`);
@@ -243,53 +165,15 @@
     $('#stockCount').textContent=`(${entries.length+unknown.length})`;
     $('#homeStats').innerHTML=`<div class="stat highlight"><strong>${entries.length}</strong><span>Produits reconnus</span></div><div class="stat"><strong>${unknown.length}</strong><span>À identifier</span></div><div class="stat"><strong>${RECIPES.length}</strong><span>Recettes disponibles</span></div>`;
     const rows=entries.sort((a,b)=>PRODUCTS[a[0]].label.localeCompare(PRODUCTS[b[0]].label,'fr')).map(([id,item])=>{
-<<<<<<< HEAD
       const p=PRODUCTS[id],unit=validDisplayUnit(p,item.displayUnit),days=expiresInDays(item);
       const dateBadge=days===null?'':`<span class="expiry-badge ${days<0?'expiry-past':days<=3?'expiry-soon':'expiry-ok'}">${days<0?'Date dépassée':days===0?'Date aujourd’hui':days===1?'Demain':days+' jours'} · ${item.dateType==='ddm'?'DDM':'DLC'}</span>`;
       const dateFields=`<label class="expiry-field">Date sur le produit <input data-expiry="${id}" type="date" value="${esc(item.expires||'')}" aria-label="Date du produit ${esc(p.label)}"></label><label class="expiry-type">Type <select data-expiry-type="${id}" aria-label="Type de date ${esc(p.label)}"><option value="dlc" ${item.dateType!=='ddm'?'selected':''}>DLC</option><option value="ddm" ${item.dateType==='ddm'?'selected':''}>DDM</option></select></label>`;
       const options=unitChoices(p).map(([v,label])=>`<option value="${v}" ${v===unit?'selected':''}>${esc(label)}</option>`).join('');
       const pack=unit==='paquet'?`<label class="pack-detail">Contenance d’un ${p.unit==='u'?'boîte':p.unit==='ml'?'bouteille':'paquet'} : <input type="number" min="0" max="1000000" step="any" placeholder="Ex. 500" data-pack-size="${id}" value="${item.packSize??''}" aria-label="Contenance d’un paquet de ${esc(p.label)}"><span>${esc(unitLabel(p.unit,item.packSize))}</span></label>`:'';
       return `<div class="stock-row"><div class="stock-name"><strong>${esc(p.label)}</strong><small>${esc(p.category)}</small>${item.qty===null?`<div class="stock-unknown">${esc(item.detail||'Quantité à préciser')}</div>`:''}${dateBadge}</div><div class="stock-controls"><div class="stock-qty"><input type="number" min="0" max="1000000" step="any" data-quantity="${id}" aria-label="Quantité de ${esc(p.label)}" placeholder="?" value="${displayQty(item,p)}"><select data-unit="${id}" aria-label="Unité de ${esc(p.label)}">${options}</select></div>${pack}<div class="expiry-controls">${dateFields}</div></div><button class="delete" type="button" data-remove-stock="${id}" aria-label="Supprimer ${esc(p.label)}">✕</button></div>`;
-=======
-      const p=PRODUCTS[id],u=displayUnit(p,item),shown=shownQty(p,item);
-      const options=unitChoices(p).map(([value,label])=>`<option value="${value}" ${u===value?'selected':''}>${esc(label)}</option>`).join('');
-      const pack=u==='paquet';const unitSize=pack?`<label class="pack-size">Contenance : <input type="number" data-pack-size="${id}" min="0" step="any" placeholder="?" value="${item.unitSize??''}" aria-label="Contenance d’un paquet de ${esc(p.label)}"> ${esc(unitLabel(p.unit,1))}/paquet</label>`:'';
-      const unknownInfo=item.qty===null||conversion(p,u,item.unitSize)===null?`<div class="stock-unknown">${esc(item.detail||'Quantité à préciser')}</div>`:'';
-      return `<div class="stock-row"><div class="stock-name"><strong>${esc(p.label)}</strong><small>${esc(p.category)}</small>${unknownInfo}</div><div class="stock-qty"><div class="qty-entry"><input type="number" min="0" max="1000000" step="any" inputmode="decimal" data-quantity="${id}" aria-label="Quantité de ${esc(p.label)}" placeholder="?" value="${shown??''}"><select data-unit="${id}" aria-label="Unité de ${esc(p.label)}">${options}</select></div>${unitSize}</div><button class="delete" type="button" data-remove-stock="${id}" aria-label="Supprimer ${esc(p.label)}">✕</button></div>`;
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     });
     rows.push(...unknown.map((item,i)=>`<div class="stock-row unrecognized"><div class="stock-name"><strong>${esc(item.text)}</strong><small>Non reconnu — essaye un nom plus simple</small></div><span class="stock-unknown">À corriger</span><button class="delete" type="button" data-remove-unknown="${i}" aria-label="Supprimer">✕</button></div>`));
     $('#stockList').innerHTML=rows.length?rows.join(''):'<div class="empty">Ton frigo est vide dans l’application. Ajoute quelques ingrédients pour commencer.</div>';
-  }
-  function updateStockQuantity(id,raw){
-    if(!PRODUCTS[id]||!state.stock[id])return;
-    const item=state.stock[id],p=PRODUCTS[id],val=raw.trim()===''?null:Number(raw.replace(',','.'));
-    const factor=conversion(p,displayUnit(p,item),item.unitSize);
-    if(val!==null&&(!Number.isFinite(val)||val<0||val>1000000)){toast('Quantité invalide.');renderStock();return;}
-    item.displayQty=val;
-    item.qty=val!==null&&factor!==null?val*factor:null;
-    item.detail=val===null?'Quantité à renseigner':factor===null?'Poids ou contenance à préciser pour calculer les courses':'';
-    resetProductChecks();save();renderAll();
-  }
-  function changeStockUnit(id,unit){
-    if(!PRODUCTS[id]||!state.stock[id]||!unitChoices(PRODUCTS[id]).some(o=>o[0]===unit))return;
-    const item=state.stock[id],p=PRODUCTS[id],oldQty=item.qty,oldDisplay=item.displayQty;
-    item.displayUnit=unit;
-    const factor=conversion(p,unit,item.unitSize);
-    if(oldQty!==null&&factor){item.displayQty=oldQty/factor;item.detail='';}
-    else if(!factor){item.qty=oldQty;item.displayQty=oldQty!==null?null:oldDisplay;item.detail=unit==='piece'?'Choisis un nombre de pièces (le poids connu reste conservé en attendant)':'Indique la contenance du paquet (la quantité connue reste conservée en attendant)';}
-    else if(oldQty===null){item.displayQty=null;item.detail='Quantité à renseigner';}
-    resetProductChecks();save();renderAll();
-  }
-  function updatePackSize(id,raw){
-    if(!PRODUCTS[id]||!state.stock[id])return;
-    const item=state.stock[id],n=Number(raw.replace(',','.'));
-    item.unitSize=raw.trim()!==''&&Number.isFinite(n)&&n>0&&n<=1000000?n:null;
-    if(item.displayUnit==='paquet'){
-      if(item.displayQty!==null)item.qty=item.unitSize!==null?item.unitSize*item.displayQty:null;
-      item.detail=item.unitSize===null||item.displayQty===null?'Indique le nombre et la contenance du paquet':'';
-    }
-    resetProductChecks();save();renderAll();
   }
   function matchRecipe(r,stock=state.stock,people=state.people){let complete=0,partial=0,unknown=0,missing=0,score=0;
     for(const ing of r.ingredients){const original=stock[ing.id],entry=excludedDLC(original)?null:original,required=ing.qty*people/r.servings;
@@ -306,21 +190,17 @@
     $('#recipesTotal').innerHTML=`${RECIPES.length}<small>recettes</small>`;
     $('#modeStock').classList.toggle('active',recipeMode==='stock');$('#modeAll').classList.toggle('active',recipeMode==='all');$('#modeFavorites').classList.toggle('active',recipeMode==='favorites');
     const search=slug($('#recipeSearch').value),cat=$('#categoryFilter').value,time=$('#timeFilter').value;
-    let rs=RECIPES.filter(r=>(cat==='all'||r.cat===cat)&&(time==='all'||r.min<=Number(time))&&filtered(r)&&equipmentAllowed(r)&&(slug(r.title).includes(search)||r.ingredients.some(i=>slug(PRODUCTS[i.id].label).includes(search))));
+    let rs=RECIPES.filter(r=>(cat==='all'||r.cat===cat)&&(time==='all'||r.min<=Number(time))&&filtered(r)&&equipmentAllowed(r)&&(slug(r.title).includes(search)||(search.length>2&&search.split(' ').every(word=>slug(r.title).split(' ').some(part=>part.startsWith(word))))||r.ingredients.some(i=>slug(PRODUCTS[i.id].label).includes(search))));
     if(recipeMode==='favorites')rs=rs.filter(r=>state.favorites.includes(r.id));
-    if(recipeMode==='stock')rs=rs.filter(r=>allowsEquipment(r)&&matchRecipe(r).available>0).sort((a,b)=>matchRecipe(b).score-matchRecipe(a).score||a.min-b.min);
+    // Une recherche explicite parcourt le catalogue complet, même si l'onglet 'Avec mon frigo' est actif.
+    if(recipeMode==='stock')rs=rs.filter(r=>search.length>0||matchRecipe(r).available>0).sort((a,b)=>matchRecipe(b).score-matchRecipe(a).score||a.min-b.min);
     else rs.sort((a,b)=>a.cat.localeCompare(b.cat)||a.title.localeCompare(b.title,'fr'));
     $('#resultsCount').textContent=`${rs.length} recette${rs.length>1?'s':''}`;
-    $('#stockExplanation').textContent=recipeMode==='stock'?'Le classement privilégie ce que tu possèdes.':recipeMode==='favorites'?'Tes recettes préférées.':'Catalogue complet, même sans ingrédients.';
+    $('#stockExplanation').textContent=recipeMode==='stock'?(search?'Recherche dans tout le catalogue ; ton stock reste pris en compte.':'Le classement privilégie ce que tu possèdes.'):recipeMode==='favorites'?'Tes recettes préférées.':'Catalogue complet, même sans ingrédients.';
     $('#recipeGrid').innerHTML=rs.length?rs.map(r=>{
-<<<<<<< HEAD
       const m=matchRecipe(r);let badge=recipeMode==='stock'?(m.exact?'<span class="match good">✓ Tout disponible · 100 %</span>':`<span class="match">${Math.round(m.score*100)} % des quantités couvertes · ${m.missing+m.partial} à compléter${m.unknown?' · '+m.unknown+' à vérifier':''}</span>`):`<span class="match">${esc(CAT_LABEL[r.cat])}</span>`;
       return `<article class="recipe-card"><div class="card-visual ${r.cat}">${photoForRecipe(r)?`<img class="recipe-photo" loading="lazy" decoding="async" src="${photoForRecipe(r)}" alt="Photographie de ${esc(r.title)}">`:`<div class="dish-emoji" aria-hidden="true">${r.emoji}</div>`}<div class="card-overlay"><button type="button" class="fav ${state.favorites.includes(r.id)?'on':''}" data-favorite="${r.id}" aria-label="${state.favorites.includes(r.id)?'Retirer des':'Ajouter aux'} favoris" title="Favori">${state.favorites.includes(r.id)?'★':'☆'}</button></div></div><div class="card-body"><h3>${esc(r.title)}</h3><div class="recipe-meta"><span>⏱ ${r.min} min</span><span>🍴 ${esc(CAT_LABEL[r.cat])}</span><span>${r.vegetarian?'🥬 Végétarien':''}</span></div><div>${badge}</div><div class="card-foot"><button class="link-button" type="button" data-recipe="${r.id}">Voir la recette →</button><small>${r.ingredients.length} ingrédients</small></div></div></article>`;
-=======
-      const m=matchRecipe(r);let badge=recipeMode==='stock'?(m.exact?'<span class="match good">✓ Tout disponible</span>':m.missing||m.partial?`<span class="match">${m.missing+m.partial} à compléter${m.unknown?' · '+m.unknown+' à vérifier':''}</span>`:`<span class="match unknown">${m.unknown} quantité(s) à vérifier</span>`):`<span class="match">${esc(CAT_LABEL[r.cat])}</span>`;
-      return `<article class="recipe-card"><div class="card-visual ${r.cat}">${photoOf(r)?`<img class="dish-photo" src="${photoOf(r)}" alt="Illustration de ${esc(r.title)}" loading="lazy" decoding="async">`:`<div class="dish-emoji" aria-hidden="true">${r.emoji}</div>`}<div class="card-overlay"><button type="button" class="fav ${state.favorites.includes(r.id)?'on':''}" data-favorite="${r.id}" aria-label="${state.favorites.includes(r.id)?'Retirer des':'Ajouter aux'} favoris" title="Favori">${state.favorites.includes(r.id)?'★':'☆'}</button></div></div><div class="card-body"><h3>${esc(r.title)}</h3><div class="recipe-meta"><span>⏱ ${r.min} min</span><span>🍴 ${esc(CAT_LABEL[r.cat])}</span><span>${r.vegetarian?'🥬 Végétarien':''}</span></div><div>${badge}</div><div class="card-foot"><button class="link-button" type="button" data-recipe="${r.id}">Voir la recette →</button><small>${r.ingredients.length} ingrédients</small></div></div></article>`;
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
-    }).join(''):`<div class="empty" style="grid-column:1/-1">Aucune recette pour ces critères. ${recipeMode==='stock'?'Ajoute des ingrédients ou passe sur « Tout découvrir ».':'Essaye des filtres moins stricts.'}</div>`;
+    }).join(''):`<div class="empty" style="grid-column:1/-1">Aucune recette pour ces critères. ${recipeMode==='stock'&&!search?'Ajoute des ingrédients ou passe sur « Tout découvrir ».':'Essaie une autre recherche ou vérifie les filtres.'}</div>`;
   }
   function cookingTip(r){
     if(['four'].includes(r.method))return 'Préchauffe le four, utilise un plat adapté et vérifie la cuisson au centre. Les fours peuvent nécessiter quelques minutes de plus ou de moins.';
@@ -333,15 +213,11 @@
   function recipeDialog(id){const r=BYID[id];if(!r)return;selectedRecipeId=id;
     const m=matchRecipe(r),slots=slotsForCat(r.cat),options=slots.map(({day,meal,course})=>`<option value="${day}:${meal}:${course}">${WEEKDAYS[day]} · ${meal==='petit'?'Petit-déjeuner':meal==='midi'?'Déjeuner':'Dîner'}${course!=='plat'?' · '+CAT_LABEL[course]:''}</option>`).join('');
     $('#recipeDialogContent').innerHTML=`<div class="modal-top"><div><div class="section-kicker">${esc(CAT_LABEL[r.cat])} · ${r.min} MIN</div><h2>${esc(r.title)}</h2></div><button class="icon-btn" data-close="recipeDialog" type="button" aria-label="Fermer">✕</button></div>
-<<<<<<< HEAD
     <div class="recipe-hero">${photoForRecipe(r)?`<img class="modal-photo" src="${photoForRecipe(r)}" alt="Photographie de ${esc(r.title)}">`:`<div class="emoji" aria-hidden="true">${r.emoji}</div>`}<div><strong>Facile à suivre</strong><p>${esc(r.method==='four'?'Cuisson au four':r.method==='froid'?'Sans cuisson':r.method==='micro-ondes'?'Micro-ondes':'Préparation '+r.method)} · ${r.ingredients.length} ingrédients</p><p>${m.exact?'Tous les ingrédients sont disponibles':m.unknown?'Certaines quantités sont à vérifier':'Tu peux compléter la liste de courses via le planning'}</p></div></div>
-=======
-    <div class="recipe-hero">${photoOf(r)?`<img class="recipe-photo" src="${photoOf(r)}" alt="Illustration du plat ${esc(r.title)}">`:`<div class="emoji" aria-hidden="true">${r.emoji}</div>`}<div><strong>Facile à suivre</strong><p>${esc(r.method==='four'?'Cuisson au four':r.method==='froid'?'Sans cuisson':r.method==='micro-ondes'?'Micro-ondes':'Préparation '+r.method)} · ${r.ingredients.length} ingrédients</p><p>${m.exact?'Tous les ingrédients sont disponibles':m.unknown?'Certaines quantités sont à vérifier':'Tu peux compléter la liste de courses via le planning'}</p></div></div>
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     <div class="small-controls"><label for="recipePortions">Portions</label><select id="recipePortions">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${i+1===state.people?'selected':''}>${i+1} personne${i>0?'s':''}</option>`).join('')}</select></div>
     <h3>Ingrédients</h3><div id="recipeIngredients"></div><h3>Préparation pas à pas</h3><p class="recipe-lead">Pour ${r.servings} personnes à l’origine · ${r.min} minutes environ · matériel : ${esc(r.method)}.</p><ol>${r.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="soft-note"><strong>Conseil pratique :</strong> ${esc(cookingTip(r))}</div>${r.note?`<div class="soft-note">ℹ ${esc(r.note)}</div>`:''}
     <div class="modal-actions"><button class="btn outline" id="toggleModalFavorite" type="button">${state.favorites.includes(r.id)?'★ Retirer des favoris':'☆ Ajouter aux favoris'}</button></div>
-    <h3>Mettre dans mes menus</h3><div class="small-controls">${options?`<select id="recipeSlot">${options}</select><button class="btn primary" id="addRecipeToPlan" type="button">Ajouter au planning</button>`:'<span class="hint">Active cette catégorie de repas dans « Ma semaine » pour l’ajouter.</span>'}</div>`;
+    <h3>Mettre dans mes menus</h3><div class="small-controls"><select id="recipeSlot">${options}</select><button class="btn primary" id="addRecipeToPlan" type="button">Ajouter au planning</button></div>`;
     $('#recipePortions').addEventListener('change',()=>renderRecipeIngredients(r,Number($('#recipePortions').value)));
     renderRecipeIngredients(r,state.people);
     $('#recipeDialog').showModal();
@@ -352,22 +228,13 @@
     return `<div class="ingredient-detail"><span>${esc(p.label)} ${status}</span><strong>${esc(fmt(ing.id,need))}</strong></div>`;
   }).join('');}
   function slotsForCat(cat){const all=[];for(let day=0;day<7;day++){
-<<<<<<< HEAD
     if(cat==='petit'&&isMealActive('petit'))all.push({day,meal:'petit',course:'plat'});
     else if(cat!=='petit')for(const meal of ['midi','soir'])if(isMealActive(meal))all.push({day,meal,course:cat});
-=======
-    if(cat==='petit'&&isMealEnabled('petit'))all.push({day,meal:'petit',course:'plat'});
-    else if(cat!=='petit')for(const meal of selectedMeals().filter(m=>m!=='petit'))all.push({day,meal,course:cat});
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
   }return all;}
   function weekSlot(day,meal,course){return meal==='petit'?state.plan[day].petit:state.plan[day][meal][course];}
   function setWeekSlot(day,meal,course,id){if(weekSlot(day,meal,course)!==id)resetProductChecks();if(meal==='petit')state.plan[day].petit=id;else state.plan[day][meal][course]=id;}
   function slotKey(day,meal,course){return `${day}:${meal}:${course}`;}
-<<<<<<< HEAD
   function weekRecipeIds(){const list=[];for(const day of state.plan){if(isMealActive('petit')&&day.petit)list.push(day.petit);for(const meal of ['midi','soir']){if(!isMealActive(meal))continue;
-=======
-  function weekRecipeIds(){const list=[];for(const day of state.plan){if(isMealEnabled('petit')&&day.petit)list.push(day.petit);for(const meal of selectedMeals().filter(m=>m!=='petit')){
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     if(state.fullCourses&&day[meal].entree)list.push(day[meal].entree);
     if(day[meal].plat)list.push(day[meal].plat);
     if(state.fullCourses&&day[meal].dessert)list.push(day[meal].dessert);
@@ -382,19 +249,14 @@
     // Les repas verrouillés comptent déjà dans les courses et dans les stocks disponibles pour les autres propositions.
     for(let day=0;day<7;day++)for(const slot of slotsForDay(day)){
       const key=slotKey(day,slot.meal,slot.course),old=weekSlot(day,slot.meal,slot.course);
-      if(old&&BYID[old]&&state.locks[key]&&(state.fullCourses||slot.course==='plat'||slot.meal==='petit'))consume(BYID[old],remaining,state.people,used);
+      if(old&&state.locks[key]&&(state.fullCourses||slot.course==='plat'||slot.meal==='petit'))consume(BYID[old],remaining,state.people,used);
     }
     for(let day=0;day<7;day++)for(const slot of slotsForDay(day)){
       const key=slotKey(day,slot.meal,slot.course);
       if(state.locks[key]&&weekSlot(day,slot.meal,slot.course))continue;
       const cat=slot.meal==='petit'?'petit':slot.course;
-<<<<<<< HEAD
       let pool=RECIPES.filter(r=>r.cat===cat&&(!state.vegetarian||r.vegetarian)&&(!state.porkFree||r.porkFree)&&(state.method!=='nooven'||r.method!=='four')&&equipmentAllowed(r));
       if(!pool.length)pool=RECIPES.filter(r=>r.cat===cat&&equipmentAllowed(r));
-=======
-      let pool=RECIPES.filter(r=>r.cat===cat&&(!state.vegetarian||r.vegetarian)&&(!state.porkFree||r.porkFree)&&(state.method!=='nooven'||r.method!=='four')&&allowsEquipment(r));
-      if(!pool.length)pool=RECIPES.filter(r=>r.cat===cat&&allowsEquipment(r));
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
       const scored=pool.map(r=>{
         const match=matchRecipe(r,remaining,state.people);
         const count=used.get(r.id)||0;
@@ -408,15 +270,9 @@
       const chosen=scored[0]?.r;
       if(chosen){setWeekSlot(day,slot.meal,slot.course,chosen.id);consume(chosen,remaining,state.people,used);}
     }
-<<<<<<< HEAD
     save();renderAll();if(showToast)toast('Semaine générée : '+mealCount()+' repas selon tes préférences.');
   }
   function slotsForDay(day){const slots=isMealActive('petit')?[{day,meal:'petit',course:'plat'}]:[];for(const meal of ['midi','soir']){if(!isMealActive(meal))continue;
-=======
-    save();renderAll();if(showToast)toast(`Semaine générée : ${selectedMeals().length*7} repas.`);
-  }
-  function slotsForDay(day){const slots=[];if(isMealEnabled('petit'))slots.push({day,meal:'petit',course:'plat'});for(const meal of selectedMeals().filter(m=>m!=='petit')){
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     if(state.fullCourses)slots.push({day,meal,course:'entree'});
     slots.push({day,meal,course:'plat'});
     if(state.fullCourses)slots.push({day,meal,course:'dessert'});
@@ -424,20 +280,11 @@
   function consume(r,remaining,people,used){used.set(r.id,(used.get(r.id)||0)+1);for(const ing of r.ingredients){const item=remaining[ing.id];if(item&&item.qty!==null)item.qty=Math.max(0,item.qty-ing.qty*people/r.servings);}}
   function renderWeek(){
     $('#peopleCount').value=state.people;$('#planPriority').value=state.priority;$('#planMethod').value=state.method;$('#mealMode').value=state.mealMode;
-<<<<<<< HEAD
     $('#weekMealCount').innerHTML=mealCount()+' <small>repas</small>';$('#weekSubtitle').textContent=MODE_LABEL[state.mealMode]+' — 7 jours organisés.';
     $('#planVegetarian').checked=state.vegetarian;$('#planPorkFree').checked=state.porkFree;$('#planCourses').checked=state.fullCourses;
     const n=weekRecipeIds().length;
     $('#weekInfo').innerHTML=`<span>👨‍👩‍👧 ${state.people} personne${state.people>1?'s':''}</span><span>🍽 ${n} recettes au programme</span><span>🔒 ${Object.values(state.locks).filter(Boolean).length} élément(s) verrouillé(s)</span>`;
     $('#weekList').innerHTML=state.plan.map((day,index)=>`<article class="day-card"><div class="day-head"><strong>${WEEKDAYS[index]}</strong><span>${index+1} / 7</span></div>${MEALS.filter(meal=>isMealActive(meal.id)).map(meal=>{
-=======
-    $('#planTotal').innerHTML=`${selectedMeals().length*7}<small>repas</small>`;$('#planSubtitle').textContent=`${selectedMeals().map(m=>MEALS.find(x=>x.id===m).label).join(', ')} — 7 jours organisés.`;
-    $('#equipmentList').querySelectorAll('input[data-equipment]').forEach(input=>input.checked=!!state.equipment[input.dataset.equipment]);
-    $('#planVegetarian').checked=state.vegetarian;$('#planPorkFree').checked=state.porkFree;$('#planCourses').checked=state.fullCourses;
-    const n=weekRecipeIds().length;
-    $('#weekInfo').innerHTML=`<span>👨‍👩‍👧 ${state.people} personne${state.people>1?'s':''}</span><span>🍽 ${n} recettes au programme</span><span>🔒 ${Object.values(state.locks).filter(Boolean).length} élément(s) verrouillé(s)</span>`;
-    $('#weekList').innerHTML=state.plan.map((day,index)=>`<article class="day-card"><div class="day-head"><strong>${WEEKDAYS[index]}</strong><span>${index+1} / 7</span></div>${MEALS.filter(meal=>isMealEnabled(meal.id)).map(meal=>{
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
       const main=meal.id==='petit'?day.petit:day[meal.id].plat;
       const locks=slotKey(index,meal.id,'plat');
       return `<div class="meal"><div class="meal-name">${meal.emoji} ${meal.label}</div><div class="meal-row"><strong><button class="link-button" type="button" data-recipe="${esc(main||'')}">${main?esc(BYID[main]?.title):'Choisir une recette'}</button></strong><div class="meal-actions"><button class="tiny-icon" type="button" data-pick="${locks}" title="Changer le repas" aria-label="Changer ${meal.label} ${WEEKDAYS[index]}">↻</button><button class="tiny-icon ${state.locks[locks]?'locked':''}" type="button" data-lock="${locks}" aria-label="${state.locks[locks]?'Déverrouiller':'Verrouiller'} ${meal.label} ${WEEKDAYS[index]}">${state.locks[locks]?'🔒':'🔓'}</button></div></div>${state.fullCourses&&meal.id!=='petit'?`<div class="courses-extra">${['entree','dessert'].map(course=>{const id=day[meal.id][course],k=slotKey(index,meal.id,course);return `<div>${CAT_LABEL[course]} : <button type="button" data-recipe="${esc(id||'')}">${id?esc(BYID[id]?.title):'À choisir'}</button><button type="button" data-pick="${k}" title="Remplacer">↻</button><button type="button" data-lock="${k}" aria-label="Verrouiller">${state.locks[k]?'🔒':'🔓'}</button></div>`;}).join('')}</div>`:''}</div>`;
@@ -469,7 +316,6 @@
     if(!items.length){$('#shoppingGroups').innerHTML='<div class="empty">Tout est déjà prévu dans ton stock, ou aucun menu n’a encore été généré.</div>';return;}
     const groups=[...new Set(items.map(i=>i.category))];
     $('#shoppingGroups').innerHTML=groups.map(cat=>`<section class="shop-group"><h3>${esc(cat)}</h3>${items.filter(i=>i.category===cat).map(i=>{
-<<<<<<< HEAD
       const done=!!state.checked[i.key];const text=i.manual?'Ajout personnel':fmtShopping(i.id,i.qty);
       return `<div class="shopping-item ${done?'checked':''}"><label><input type="checkbox" data-shop-check="${esc(i.key)}" ${done?'checked':''}><span>${esc(i.label)}</span></label><div class="shop-qty">${esc(text)}${i.unknown?'<small>Quantité au frigo inconnue</small>':''}${i.manual?`<button class="link-button" data-delete-manual="${esc(i.key.slice(7))}" type="button">Retirer</button>`:''}</div></div>`;
     }).join('')}</section>`).join('');
@@ -496,31 +342,6 @@
     html+='<p class="print-eco">'+eco+'</p>';
     $('#printLayout').innerHTML=html;
     window.print();
-=======
-      const done=!!state.checked[i.key];const text=i.manual?'Ajout personnel':formatShopping(i.id,i.qty);
-      return `<div class="shopping-item ${done?'checked':''}"><label><input type="checkbox" data-shop-check="${esc(i.key)}" ${done?'checked':''}><span>${esc(i.label)}</span></label><div class="shop-qty">${esc(text)}${i.unknown?'<small>Quantité au frigo inconnue</small>':''}${i.manual?`<button class="link-button" data-delete-manual="${esc(i.key.slice(7))}" type="button">Retirer</button>`:''}</div></div>`;
-    }).join('')}</section>`).join('');
-  }
-  function shopText(){const items=shopRows();const groups=[...new Set(items.map(i=>i.category))];return groups.map(cat=>cat.toUpperCase()+'\n'+items.filter(i=>i.category===cat).map(i=>`☐ ${i.label} : ${i.manual?'quantité libre':formatShopping(i.id,i.qty)}${i.unknown?' (à vérifier)':''}`).join('\n')).join('\n\n');}
-  function printDocument(mode){
-    let html='<header class="print-header"><h1>Frigo Express — '+(mode==='menu'?'Menus de la semaine':mode==='courses'?'Liste de courses':'Menus & courses')+'</h1>';
-    html+=`<p>${state.people} personne${state.people>1?'s':''} · ${selectedMeals().length*7} repas · ${new Date().toLocaleDateString('fr-FR')}</p><p class="print-eco">🌱 Pensez à la planète : vos menus et courses sont disponibles sur téléphone. Vous pouvez enregistrer ce document en PDF avant d’imprimer.</p></header>`;
-    if(mode!=='courses'){
-      const heads=selectedMeals().map(m=>MEALS.find(x=>x.id===m).label);
-      html+='<h2>Planning du lundi au dimanche</h2><table><thead><tr><th>Jour</th>'+heads.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>';
-      html+=state.plan.map((d,i)=>`<tr><th>${WEEKDAYS[i]}</th>${selectedMeals().map(m=>`<td>${esc(m==='petit'?BYID[d.petit]?.title||'—':displayMeal(d[m]))}</td>`).join('')}</tr>`).join('');html+='</tbody></table>';
-    }
-    if(mode!=='menu'){
-      html+='<h2>Liste de courses</h2>';
-      const items=shopRows();if(items.some(i=>i.unknown))html+='<p class="print-eco">⚠ Les quantités inconnues du frigo sont à vérifier avant les achats.</p>';
-      html+='<div class="print-shopping-columns">';for(const cat of [...new Set(items.map(i=>i.category))]){
-        html+=`<section class="print-shop-section"><h3>${esc(cat)}</h3>`;
-        html+=items.filter(i=>i.category===cat).map(i=>`<p><span class="print-check"></span>${esc(i.label)} — ${esc(i.manual?'quantité libre':formatShopping(i.id,i.qty))}${i.unknown?' <strong>(à vérifier)</strong>':''}</p>`).join('');html+='</section>';
-      }
-      html+='</div>';
-    }
-    $('#printLayout').innerHTML=html;window.print();
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
   }
   function displayMeal(meal){if(!meal)return '—';let out=BYID[meal.plat]?.title||'—';if(state.fullCourses){if(meal.entree)out='Entrée : '+BYID[meal.entree].title+' / '+out;if(meal.dessert)out+=' / Dessert : '+BYID[meal.dessert].title;}return out;}
   async function shareShop(){
@@ -537,7 +358,6 @@
   function renderEquipments(){const el=$('#equipmentOptions');if(el)el.innerHTML=EQUIPMENTS.map(([id,label])=>`<label class="equip-option"><input type="checkbox" data-equipment="${id}" ${state.equipments.includes(id)?'checked':''}> ${esc(label)}</label>`).join('');}
 
   function bind(){
-    for(const [key,label] of Object.entries(EQUIPMENT)){const holder=document.createElement('label');holder.className='equipment-choice';holder.innerHTML=`<input type="checkbox" data-equipment="${key}" ${state.equipment[key]?'checked':''}> ${esc(label)}`;$('#equipmentList').appendChild(holder);}
     for(const [id,text] of [['oeuf','+ Œufs'],['pates','+ Pâtes'],['riz','+ Riz'],['fromage','+ Fromage'],['pomme_terre','+ Pommes de terre'],['tomate','+ Tomates'],['jambon','+ Jambon'],['lait','+ Lait']]){
       const b=document.createElement('button');b.type='button';b.className='tag';b.dataset.quick=id;b.textContent=text;$('#quickProducts').appendChild(b);
     }
@@ -566,24 +386,16 @@
       if(b.dataset.close){$('#'+b.dataset.close).close();return;}
     });
     document.addEventListener('change',e=>{
-<<<<<<< HEAD
       const t=e.target;
       if(t.dataset.expiry){const item=state.stock[t.dataset.expiry];if(item){item.expires=/^\d{4}-\d{2}-\d{2}$/.test(t.value)?t.value:'';resetProductChecks();save();renderAll();}return;}
       if(t.dataset.expiryType){const item=state.stock[t.dataset.expiryType];if(item){item.dateType=t.value==='ddm'?'ddm':'dlc';resetProductChecks();save();renderAll();}return;}
       if(t.dataset.quantity){const id=t.dataset.quantity;if(state.stock[id])readStockQuantity(state.stock[id],PRODUCTS[id],t.value);resetProductChecks();save();renderAll();return;}
       if(t.dataset.unit){const id=t.dataset.unit;if(state.stock[id])chooseStockUnit(state.stock[id],PRODUCTS[id],t.value);resetProductChecks();save();renderAll();return;}
       if(t.dataset.packSize){const id=t.dataset.packSize,item=state.stock[id];if(item){const size=Number(t.value.replace(',','.'));item.packSize=Number.isFinite(size)&&size>0&&size<=1000000?size:null;if(item.packSize>0){if(item.packCount!==null)item.qty=item.packCount*item.packSize;else if(item.qty!==null)item.packCount=Number((item.qty/item.packSize).toFixed(3));}else if(item.packCount!==null)item.qty=null;item.detail=item.qty===null?'Précise la contenance et le nombre de paquets':'';resetProductChecks();save();renderAll();}return;}
-=======
-      const t=e.target;if(t.dataset.quantity){updateStockQuantity(t.dataset.quantity,t.value);return;}
-      if(t.dataset.unit){changeStockUnit(t.dataset.unit,t.value);return;}
-      if(t.dataset.packSize){updatePackSize(t.dataset.packSize,t.value);return;}
-      if(t.dataset.equipment){state.equipment[t.dataset.equipment]=t.checked;save();renderWeek();return;}
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
       if(t.dataset.shopCheck){state.checked[t.dataset.shopCheck]=t.checked;save();renderShop();return;}
     });
     $('#stockAdd').addEventListener('click',()=>{addParsed($('#stockText').value);$('#stockText').value='';});
     $('#stockText').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();$('#stockAdd').click();}});
-<<<<<<< HEAD
     const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
     $('#voiceStock').addEventListener('click',()=>{if(!Speech){toast('Dictée non disponible dans ce navigateur.');return;}
       const recognition=new Speech();recognition.lang='fr-FR';recognition.interimResults=false;recognition.maxAlternatives=1;
@@ -597,13 +409,6 @@
     $('#confirmClearStock').addEventListener('click',()=>{const previous=structuredClone({stock:state.stock,unknown:state.unknown});state.stock={};state.unknown=[];resetProductChecks();save();renderAll();$('#clearStockDialog').close();
       const bar=$('#undoBar');bar.hidden=false;bar.dataset.payload=JSON.stringify(previous);toast('Stock vidé. Tu peux annuler la suppression.');});
     $('#undoClearStock').addEventListener('click',()=>{const bar=$('#undoBar');try{const prev=JSON.parse(bar.dataset.payload);state.stock=prev.stock;state.unknown=prev.unknown;resetProductChecks();save();renderAll();toast('Stock restauré.');}catch{toast('Restauration impossible.');}bar.hidden=true;bar.dataset.payload='';});
-=======
-    let clearedSnapshot=null,undoTimer=null;
-    $('#clearStock').addEventListener('click',()=>{const n=Object.keys(state.stock).length+state.unknown.length;if(!n)return;$('#clearCount').textContent=`${n} ingrédient${n>1?'s':''} seront supprimés.`;$('#clearConfirmDialog').showModal();});
-    $('#confirmClear').addEventListener('click',()=>{clearedSnapshot={stock:structuredClone(state.stock),unknown:structuredClone(state.unknown)};state.stock={};state.unknown=[];resetProductChecks();save();renderAll();$('#clearConfirmDialog').close();$('#undoClearBanner').hidden=false;clearTimeout(undoTimer);undoTimer=setTimeout(()=>{clearedSnapshot=null;$('#undoClearBanner').hidden=true;},12000);});
-    $('#undoClear').addEventListener('click',()=>{if(!clearedSnapshot)return;state.stock=clearedSnapshot.stock;state.unknown=clearedSnapshot.unknown;clearedSnapshot=null;clearTimeout(undoTimer);$('#undoClearBanner').hidden=true;resetProductChecks();save();renderAll();toast('Ingrédients restaurés.');});
-    $('#mealMode').addEventListener('change',e=>{state.mealMode=MEAL_MODES[e.target.value]?e.target.value:'all';resetProductChecks();save();renderAll();});
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
     for(const [id,mode] of [['modeStock','stock'],['modeAll','all'],['modeFavorites','favorites']])$('#'+id).addEventListener('click',()=>{recipeMode=mode;renderRecipes();});
     for(const id of ['recipeSearch','categoryFilter','timeFilter','vegetarianFilter','porkFilter','noOvenFilter','veganFilter','glutenFilter'])$('#'+id).addEventListener(id==='recipeSearch'?'input':'change',renderRecipes);
     $('#peopleCount').addEventListener('change',e=>{state.people=Math.min(12,Math.max(1,Math.round(Number(e.target.value)||2)));resetProductChecks();save();renderAll();});
@@ -655,9 +460,5 @@
   renderAll();
   if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
   // API de test uniquement : pas d'opérations réseau.
-<<<<<<< HEAD
   window.FRIGO_TEST={parseStock,matchRecipe,ingredientsNeeded,shopRows,validate,getState:()=>structuredClone(state),setState:s=>{state=validate(s);save();renderAll();},generateWeek:()=>generateWeek(false),printDocument,fmt,fmtShopping,productFromText,mealCount,unitChoices,displayQty,readStockQuantity,chooseStockUnit,equipmentAllowed};
-=======
-  window.FRIGO_TEST={parseStock,matchRecipe,ingredientsNeeded,shopRows,validate,getState:()=>structuredClone(state),setState:s=>{state=validate(s);save();renderAll();},generateWeek:()=>generateWeek(false),fmt,formatShopping,printDocument,selectedMeals,changeStockUnit,updateStockQuantity,updatePackSize,productFromText};
->>>>>>> be7e0664e590d43a1428f935fc2ecba91241fe27
 })();

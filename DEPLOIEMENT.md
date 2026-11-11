@@ -1,22 +1,24 @@
-# Frigo Express V0.3 — mise à jour GitHub Pages
+# Frigo Express V0.3.1 — corriger le nouveau dépôt GitHub
 
-**Avant toute mise à jour :** sur ton téléphone, dans **Réglages & sauvegardes**, exporter la sauvegarde JSON et la conserver.
+Le dépôt GitHub a été recréé. Ne copie pas un ancien dossier `.git` dans ce nouveau dépôt : leurs historiques peuvent être différents et déclencher des conflits.
 
-## Publier depuis GitHub Desktop (le ZIP Git)
-1. Décompresser le ZIP **Projet Git** dans un dossier local (y compris `.git`).
-2. Ouvrir ce dossier avec GitHub Desktop, vérifier les fichiers modifiés.
-3. Faire un commit `Frigo Express V0.3 — unités, menus, impression, équipements` puis pousser (`Push origin`).
-4. Vérifier dans **Settings > Pages** du dépôt que `main / (root)` est sélectionné.
-5. Ouvrir `https://cjajlk.github.io/frigo-express/` sur le Samsung ; recharger si la page est ancienne.
+## Méthode recommandée (GitHub Desktop)
 
-## Publier sans GitHub Desktop (le ZIP Publication)
-Décompresser **Publication** et mettre **son contenu** à la racine du dépôt (ne pas déposer l’archive ni un dossier parent). Ne pas uploader le dossier `.git`. Vérifier que `index.html` est à la racine.
+1. Sur le Samsung, ouvrir Frigo Express > Réglages > Exporter ma sauvegarde JSON. Garder ce fichier.
+2. Sur PC, dans GitHub Desktop, cloner le nouveau `cjajlk/frigo-express` dans un dossier neuf (ou utiliser la copie locale déjà rattachée au nouveau dépôt, à condition qu'elle ne soit pas en conflit).
+3. Décompresser **Frigo_Express_V0.3.1_Publication_GitHub.zip** et copier **le contenu** à la racine de ce dossier, en remplaçant les fichiers existants : `index.html`, `css/style.css`, `js/app.js`, `js/data.js`, `sw.js`, documentation et autres fichiers.
+4. Vérifier l'absence de `<<<<<<< HEAD`, `=======` ou `>>>>>>>` dans les fichiers ; vérifier que `index.html` est bien à la racine.
+5. Dans GitHub Desktop : **Commit to main** puis **Push origin** (jamais Push force). Aucun ancien dossier `.git` ne doit être copié.
+6. Ouvrir `https://cjajlk.github.io/frigo-express/`. Si l'ancien écran persiste, fermer l'onglet, rouvrir le site et actualiser ; le cache hors ligne change de nom en V0.3.1.
 
-## Sauvegardes & compatibilité
-Le nom du stockage navigateur n'a pas changé (`frigo-express-v01`). Le stock et les favoris V0.1 restent lisibles. Ne jamais effacer les données du site ni désinstaller l'application sans export préalable.
+## Contrôles après publication
 
-## PDF
-Depuis « PDF / Imprimer », ouvrir le dialogue système puis choisir soit « Enregistrer en PDF », soit l'imprimante. Le rendu a été vérifié sur un moteur PDF de test : **21 repas sur 1 page, 49 recettes (avec entrées et desserts) sur 2 pages**. Il faudra confirmer la pagination dans la prévisualisation Android, car elle peut varier selon l'appareil.
+- Rechercher **Blanquette de veau** depuis Recettes, même avec le frigo vide : la fiche doit apparaître.
+- Chercher **Bœuf bourguignon**, **Hachis parmentier**, **Gâteau marbré**.
+- Ouvrir les détails et vérifier les étapes numérotées, les quantités selon 5 personnes et le choix des unités.
+- Générer 7 / 14 / 21 repas, vérifier la liste de courses et son PDF.
+- Vérifier que le stock, les menus et les favoris du téléphone sont conservés.
 
-## Limites de cette livraison
-Deux photos culinaires locales ont été ajoutées. Les autres recettes conservent un pictogramme pour le moment. Les recettes libres externes ne sont pas encore connectées : leurs licences et formats de données devront être vérifiés avant intégration.
+## Important
+
+Ne pas uploader un ZIP tel quel : décompresser l'archive puis transférer son contenu. Le ZIP « Projet_Git » conserve un historique ancien pour archive/développement, mais **n'est pas à remplacer dans le nouveau dépôt GitHub**.
