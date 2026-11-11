@@ -1,5 +1,13 @@
 # Frigo Express — Historique des versions
 
+## V0.4.0 — 11 novembre 2026
+
+- 379 recettes, 158 produits ; 53 nouvelles recettes : 16 desserts faciles, 9 plats/desserts régionaux français, 28 cuisines du monde.
+- Sélecteurs interactifs « Cuisine et origine » et « Région française », recherche par cuisine et affichage de l’origine sur les cartes et fiches.
+- Descriptions détaillées, proportions pour 2 personnes et conseils ; les recettes inspirées/simplifiées sont signalées.
+- IDs des 326 recettes préexistantes conservés ; même clé de sauvegarde `frigo-express-v01` ; favoris et menus compatibles.
+- Cache offline actualisé. Tests Node réussis. Essais navigateur bloqués par la politique Chromium, à vérifier sur Samsung.
+
 ## V0.3.1 — 11 novembre 2026
 
 - Retour à une base sans marqueurs de conflits Git ; fichiers JavaScript/HTML/CSS reconstruits à partir du dernier projet sain.

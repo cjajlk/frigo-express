@@ -74,3 +74,11 @@
 .modal ol li{line-height:1.65;margin-bottom:5px}
 @media(max-width:650px){.expiry-controls{justify-content:flex-start}.expiry-field{flex-direction:column;align-items:flex-start}.expiry-type{flex-direction:column;align-items:flex-start}.expiry-field input{width:100px}.stock-row{grid-template-columns:minmax(0,1fr) minmax(146px,181px) 32px}}
 @media print{.suggestion-list{display:none!important}}
+
+/* V0.4 : classification culinaire, lisible sur smartphone. */
+.filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.filter-grid .field:first-child{grid-column:span 1}
+.filter-grid .field[hidden]{display:none!important}
+.recipe-meta span{max-width:100%;overflow-wrap:anywhere}
+@media(max-width:650px){.filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-grid .field:first-child{grid-column:1/-1}}
+@media(max-width:350px){.filter-grid{grid-template-columns:1fr}.filter-grid .field:first-child{grid-column:auto}}

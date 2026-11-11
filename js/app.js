@@ -1,4 +1,4 @@
-/* Frigo Express V0.3.1 — recettes classiques et recherche améliorée. */
+/* Frigo Express V0.4 — desserts faciles, spécialités régionales et cuisines du monde. */
 (() => {
   'use strict';
   const D=window.FRIGO_DATA;
@@ -7,6 +7,16 @@
   const STORE='frigo-express-v01', WEEKDAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   const MEALS=[{id:'petit',label:'Petit-déjeuner',emoji:'☀️'},{id:'midi',label:'Déjeuner',emoji:'🍽️'},{id:'soir',label:'Dîner',emoji:'🌙'}];
   const CAT_LABEL={petit:'Petit-déjeuner',entree:'Entrée',plat:'Plat',dessert:'Dessert'};
+  const ORIGINS={maison:'Cuisine du quotidien',france:'France',italie:'Italie',espagne:'Espagne',maroc:'Maroc',maghreb:'Maghreb',inde:'Inde',senegal:'Sénégal',cote_ivoire:'Afrique de l’Ouest',chine:'Chine',japon:'Japon',thailande:'Thaïlande',mexique:'Mexique',portugal:'Portugal',liban:'Liban'};
+  const originLabel=r=>r.region?`${ORIGINS[r.origin]||'Cuisine maison'} · ${r.region}`:(ORIGINS[r.origin]||'Cuisine maison');
+  function initOrigins(){
+    const cuisine=$('#originFilter'),region=$('#regionFilter');
+    const used=[...new Set(RECIPES.map(r=>r.origin||'maison'))].sort((a,b)=>(ORIGINS[a]||a).localeCompare(ORIGINS[b]||b,'fr'));
+    cuisine.innerHTML='<option value="all">Toutes les cuisines</option>'+used.map(k=>`<option value="${esc(k)}">${esc(ORIGINS[k]||k)}</option>`).join('');
+    const regions=[...new Set(RECIPES.filter(r=>r.origin==='france'&&r.region).map(r=>r.region))].sort((a,b)=>a.localeCompare(b,'fr'));
+    region.innerHTML='<option value="all">Toutes les régions</option>'+regions.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');
+    cuisine.value='all';region.value='all';
+  }
   const EQUIPMENTS=[['four','Four'],['plaques','Plaques / cuisinière'],['micro-ondes','Micro-ondes'],['gaufrier','Gaufrier'],['friteuse','Friteuse'],['raclette','Appareil à raclette'],['crepiere','Crêpière']];
   const ALL_EQUIPMENTS=EQUIPMENTS.map(x=>x[0]);
   const MODE_LABEL={all:'Petit-déjeuner, midi et soir',lunch_dinner:'Midi et soir',dinner:'Le soir uniquement'};
@@ -189,8 +199,9 @@
   function renderRecipes(){
     $('#recipesTotal').innerHTML=`${RECIPES.length}<small>recettes</small>`;
     $('#modeStock').classList.toggle('active',recipeMode==='stock');$('#modeAll').classList.toggle('active',recipeMode==='all');$('#modeFavorites').classList.toggle('active',recipeMode==='favorites');
-    const search=slug($('#recipeSearch').value),cat=$('#categoryFilter').value,time=$('#timeFilter').value;
-    let rs=RECIPES.filter(r=>(cat==='all'||r.cat===cat)&&(time==='all'||r.min<=Number(time))&&filtered(r)&&equipmentAllowed(r)&&(slug(r.title).includes(search)||(search.length>2&&search.split(' ').every(word=>slug(r.title).split(' ').some(part=>part.startsWith(word))))||r.ingredients.some(i=>slug(PRODUCTS[i.id].label).includes(search))));
+    const search=slug($('#recipeSearch').value),cat=$('#categoryFilter').value,time=$('#timeFilter').value,origin=$('#originFilter').value,region=$('#regionFilter').value;
+    $('#regionField').hidden=origin!=='france';
+    let rs=RECIPES.filter(r=>(cat==='all'||r.cat===cat)&&(time==='all'||r.min<=Number(time))&&(origin==='all'||r.origin===origin)&&(origin!=='france'||region==='all'||r.region===region)&&filtered(r)&&equipmentAllowed(r)&&(slug(r.title).includes(search)||(search.length>2&&search.split(' ').every(word=>slug(r.title).split(' ').some(part=>part.startsWith(word))))||r.ingredients.some(i=>slug(PRODUCTS[i.id].label).includes(search))||slug(originLabel(r)).includes(search)));
     if(recipeMode==='favorites')rs=rs.filter(r=>state.favorites.includes(r.id));
     // Une recherche explicite parcourt le catalogue complet, même si l'onglet 'Avec mon frigo' est actif.
     if(recipeMode==='stock')rs=rs.filter(r=>search.length>0||matchRecipe(r).available>0).sort((a,b)=>matchRecipe(b).score-matchRecipe(a).score||a.min-b.min);
@@ -199,7 +210,7 @@
     $('#stockExplanation').textContent=recipeMode==='stock'?(search?'Recherche dans tout le catalogue ; ton stock reste pris en compte.':'Le classement privilégie ce que tu possèdes.'):recipeMode==='favorites'?'Tes recettes préférées.':'Catalogue complet, même sans ingrédients.';
     $('#recipeGrid').innerHTML=rs.length?rs.map(r=>{
       const m=matchRecipe(r);let badge=recipeMode==='stock'?(m.exact?'<span class="match good">✓ Tout disponible · 100 %</span>':`<span class="match">${Math.round(m.score*100)} % des quantités couvertes · ${m.missing+m.partial} à compléter${m.unknown?' · '+m.unknown+' à vérifier':''}</span>`):`<span class="match">${esc(CAT_LABEL[r.cat])}</span>`;
-      return `<article class="recipe-card"><div class="card-visual ${r.cat}">${photoForRecipe(r)?`<img class="recipe-photo" loading="lazy" decoding="async" src="${photoForRecipe(r)}" alt="Photographie de ${esc(r.title)}">`:`<div class="dish-emoji" aria-hidden="true">${r.emoji}</div>`}<div class="card-overlay"><button type="button" class="fav ${state.favorites.includes(r.id)?'on':''}" data-favorite="${r.id}" aria-label="${state.favorites.includes(r.id)?'Retirer des':'Ajouter aux'} favoris" title="Favori">${state.favorites.includes(r.id)?'★':'☆'}</button></div></div><div class="card-body"><h3>${esc(r.title)}</h3><div class="recipe-meta"><span>⏱ ${r.min} min</span><span>🍴 ${esc(CAT_LABEL[r.cat])}</span><span>${r.vegetarian?'🥬 Végétarien':''}</span></div><div>${badge}</div><div class="card-foot"><button class="link-button" type="button" data-recipe="${r.id}">Voir la recette →</button><small>${r.ingredients.length} ingrédients</small></div></div></article>`;
+      return `<article class="recipe-card"><div class="card-visual ${r.cat}">${photoForRecipe(r)?`<img class="recipe-photo" loading="lazy" decoding="async" src="${photoForRecipe(r)}" alt="Photographie de ${esc(r.title)}">`:`<div class="dish-emoji" aria-hidden="true">${r.emoji}</div>`}<div class="card-overlay"><button type="button" class="fav ${state.favorites.includes(r.id)?'on':''}" data-favorite="${r.id}" aria-label="${state.favorites.includes(r.id)?'Retirer des':'Ajouter aux'} favoris" title="Favori">${state.favorites.includes(r.id)?'★':'☆'}</button></div></div><div class="card-body"><h3>${esc(r.title)}</h3><div class="recipe-meta"><span>⏱ ${r.min} min</span><span>🍴 ${esc(CAT_LABEL[r.cat])}</span><span>🌍 ${esc(originLabel(r))}</span><span>${r.vegetarian?'🥬 Végétarien':''}</span></div><div>${badge}</div><div class="card-foot"><button class="link-button" type="button" data-recipe="${r.id}">Voir la recette →</button><small>${r.ingredients.length} ingrédients</small></div></div></article>`;
     }).join(''):`<div class="empty" style="grid-column:1/-1">Aucune recette pour ces critères. ${recipeMode==='stock'&&!search?'Ajoute des ingrédients ou passe sur « Tout découvrir ».':'Essaie une autre recherche ou vérifie les filtres.'}</div>`;
   }
   function cookingTip(r){
@@ -212,7 +223,7 @@
   }
   function recipeDialog(id){const r=BYID[id];if(!r)return;selectedRecipeId=id;
     const m=matchRecipe(r),slots=slotsForCat(r.cat),options=slots.map(({day,meal,course})=>`<option value="${day}:${meal}:${course}">${WEEKDAYS[day]} · ${meal==='petit'?'Petit-déjeuner':meal==='midi'?'Déjeuner':'Dîner'}${course!=='plat'?' · '+CAT_LABEL[course]:''}</option>`).join('');
-    $('#recipeDialogContent').innerHTML=`<div class="modal-top"><div><div class="section-kicker">${esc(CAT_LABEL[r.cat])} · ${r.min} MIN</div><h2>${esc(r.title)}</h2></div><button class="icon-btn" data-close="recipeDialog" type="button" aria-label="Fermer">✕</button></div>
+    $('#recipeDialogContent').innerHTML=`<div class="modal-top"><div><div class="section-kicker">${esc(CAT_LABEL[r.cat])} · ${r.min} MIN · ${esc(originLabel(r))}</div><h2>${esc(r.title)}</h2></div><button class="icon-btn" data-close="recipeDialog" type="button" aria-label="Fermer">✕</button></div>
     <div class="recipe-hero">${photoForRecipe(r)?`<img class="modal-photo" src="${photoForRecipe(r)}" alt="Photographie de ${esc(r.title)}">`:`<div class="emoji" aria-hidden="true">${r.emoji}</div>`}<div><strong>Facile à suivre</strong><p>${esc(r.method==='four'?'Cuisson au four':r.method==='froid'?'Sans cuisson':r.method==='micro-ondes'?'Micro-ondes':'Préparation '+r.method)} · ${r.ingredients.length} ingrédients</p><p>${m.exact?'Tous les ingrédients sont disponibles':m.unknown?'Certaines quantités sont à vérifier':'Tu peux compléter la liste de courses via le planning'}</p></div></div>
     <div class="small-controls"><label for="recipePortions">Portions</label><select id="recipePortions">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${i+1===state.people?'selected':''}>${i+1} personne${i>0?'s':''}</option>`).join('')}</select></div>
     <h3>Ingrédients</h3><div id="recipeIngredients"></div><h3>Préparation pas à pas</h3><p class="recipe-lead">Pour ${r.servings} personnes à l’origine · ${r.min} minutes environ · matériel : ${esc(r.method)}.</p><ol>${r.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="soft-note"><strong>Conseil pratique :</strong> ${esc(cookingTip(r))}</div>${r.note?`<div class="soft-note">ℹ ${esc(r.note)}</div>`:''}
@@ -295,7 +306,7 @@
   function renderPicker(){if(!pickerTarget)return;const {meal,course}=pickerTarget,cat=meal==='petit'?'petit':course,search=slug($('#pickerSearch').value);
     let rs=RECIPES.filter(r=>r.cat===cat&&equipmentAllowed(r)&&slug(r.title).includes(search));
     rs.sort((a,b)=>matchRecipe(b).score-matchRecipe(a).score||a.min-b.min);
-    $('#pickerList').innerHTML=rs.slice(0,100).map(r=>`<button class="picker-option" type="button" data-pick-recipe="${r.id}"><span>${r.emoji} ${esc(r.title)}</span><small>${r.min} min</small></button>`).join('')||'<div class="empty">Aucune recette trouvée.</div>';
+    $('#pickerList').innerHTML=rs.slice(0,100).map(r=>`<button class="picker-option" type="button" data-pick-recipe="${r.id}"><span>${r.emoji} ${esc(r.title)}</span><small>${esc(originLabel(r))} · ${r.min} min</small></button>`).join('')||'<div class="empty">Aucune recette trouvée.</div>';
   }
   function ingredientsNeeded(){const sum={};for(const id of weekRecipeIds()){
     const recipe=BYID[id];if(!recipe)continue;for(const ing of recipe.ingredients){sum[ing.id]=(sum[ing.id]||0)+ing.qty*state.people/recipe.servings;}
@@ -410,7 +421,7 @@
       const bar=$('#undoBar');bar.hidden=false;bar.dataset.payload=JSON.stringify(previous);toast('Stock vidé. Tu peux annuler la suppression.');});
     $('#undoClearStock').addEventListener('click',()=>{const bar=$('#undoBar');try{const prev=JSON.parse(bar.dataset.payload);state.stock=prev.stock;state.unknown=prev.unknown;resetProductChecks();save();renderAll();toast('Stock restauré.');}catch{toast('Restauration impossible.');}bar.hidden=true;bar.dataset.payload='';});
     for(const [id,mode] of [['modeStock','stock'],['modeAll','all'],['modeFavorites','favorites']])$('#'+id).addEventListener('click',()=>{recipeMode=mode;renderRecipes();});
-    for(const id of ['recipeSearch','categoryFilter','timeFilter','vegetarianFilter','porkFilter','noOvenFilter','veganFilter','glutenFilter'])$('#'+id).addEventListener(id==='recipeSearch'?'input':'change',renderRecipes);
+    for(const id of ['recipeSearch','categoryFilter','timeFilter','originFilter','regionFilter','vegetarianFilter','porkFilter','noOvenFilter','veganFilter','glutenFilter'])$('#'+id).addEventListener(id==='recipeSearch'?'input':'change',renderRecipes);
     $('#peopleCount').addEventListener('change',e=>{state.people=Math.min(12,Math.max(1,Math.round(Number(e.target.value)||2)));resetProductChecks();save();renderAll();});
     $('#mealMode').addEventListener('change',e=>{state.mealMode=Object.hasOwn(MODE_LABEL,e.target.value)?e.target.value:'all';resetProductChecks();save();renderAll();});
     $('#equipmentOptions').addEventListener('change',e=>{if(!e.target.dataset.equipment)return;const eq=e.target.dataset.equipment;state.equipments=state.equipments.filter(v=>v!==eq);if(e.target.checked)state.equipments.push(eq);save();renderAll();});
@@ -426,6 +437,7 @@
     $('#manualItem').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addManual();}});
     for(const id of ['settingsBtn','footerSettings'])$('#'+id).addEventListener('click',()=>$('#settingsDialog').showModal());
     $('#equipmentSettingsLink').addEventListener('click',()=>$('#settingsDialog').showModal());
+    $('#originFilter').addEventListener('change',()=>{$('#regionFilter').value='all';renderRecipes();});
     $('#pickerSearch').addEventListener('input',renderPicker);
     $('#exportData').addEventListener('click',()=>{
       const blob=new Blob([JSON.stringify({app:'Frigo Express',version:D.version,exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});
@@ -455,10 +467,11 @@
   }
   function toggleFavorite(id){if(!BYID[id])return;const i=state.favorites.indexOf(id);if(i>=0)state.favorites.splice(i,1);else state.favorites.push(id);save();renderRecipes();if($('#recipeDialog').open&&selectedRecipeId===id)$('#toggleModalFavorite').textContent=state.favorites.includes(id)?'★ Retirer des favoris':'☆ Ajouter aux favoris';}
   // Initialisation
+  initOrigins();
   bind();
   if(!weekRecipeIds().length)generateWeek(false);
   renderAll();
   if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
   // API de test uniquement : pas d'opérations réseau.
-  window.FRIGO_TEST={parseStock,matchRecipe,ingredientsNeeded,shopRows,validate,getState:()=>structuredClone(state),setState:s=>{state=validate(s);save();renderAll();},generateWeek:()=>generateWeek(false),printDocument,fmt,fmtShopping,productFromText,mealCount,unitChoices,displayQty,readStockQuantity,chooseStockUnit,equipmentAllowed};
+  window.FRIGO_TEST={originLabel,ORIGINS,parseStock,matchRecipe,ingredientsNeeded,shopRows,validate,getState:()=>structuredClone(state),setState:s=>{state=validate(s);save();renderAll();},generateWeek:()=>generateWeek(false),printDocument,fmt,fmtShopping,productFromText,mealCount,unitChoices,displayQty,readStockQuantity,chooseStockUnit,equipmentAllowed};
 })();
